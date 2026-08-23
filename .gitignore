@@ -1,0 +1,57 @@
+# 깃허브에 올리면 안 되는 파일 목록.
+# 특히 .env 에는 Upstage API 키가 들어 있으므로 절대 커밋하지 않는다.
+
+# 의존성
+node_modules/
+jspm_packages/
+.npm/
+.yarn/
+.pnp
+.pnp.*
+
+# 환경 변수 (API 키가 들어 있으므로 절대 커밋 금지)
+.env
+.env.*
+!.env.example
+
+# 로그
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 실행 중 생기는 파일
+.cache/
+tmp/
+temp/
+coverage/
+dist/
+build/
+*.pid
+*.seed
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# 편집기 / 개발 도구
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+# 내 컴퓨터에서만 쓰는 실행 설정. 팀과 공유하고 싶다면 이 줄을 지운다.
+.claude/
+
+# 한글·오피스 임시 파일 (학교 컴퓨터에서 자주 섞여 들어온다)
+~$*
+*.hwp.bak

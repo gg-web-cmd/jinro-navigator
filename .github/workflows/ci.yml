@@ -1,0 +1,43 @@
+# 깃허브 액션 CI — push 와 pull request 때마다 도는 가벼운 자동 점검.
+# 별도 테스트 프레임워크 없이 (1) 자바스크립트 문법 검사와 (2) 문항 수·유형 분포 검증만 한다.
+# 여기서 실패하면 Render 에 올리기 전에 문제를 먼저 알 수 있다.
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# 같은 브랜치에서 연달아 push 하면 이전 실행은 취소한다.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: 문법 검사와 문항 검증
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 내려받기
+        uses: actions/checkout@v4
+
+      - name: Node.js 20 준비
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: 자바스크립트 문법 검사
+        run: |
+          set -e
+          for f in server.js lib/*.js public/js/*.js public/js/data/*.js scripts/*.mjs; do
+            echo "검사: $f"
+            node --check "$f"
+          done
+
+      - name: 문항 수와 유형 분포 검증
+        run: npm run check

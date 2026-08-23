@@ -1,0 +1,30 @@
+# Render 배포 설계도(Blueprint) — 이 파일이 저장소에 있으면 Render 가 서비스 설정을 자동으로 읽어 간다.
+# 웹 서비스 1개(Node)로 server.js 를 띄우고, /api/health 로 살아있는지 확인한다.
+# UPSTAGE_API_KEY 는 여기에 적지 않고 Render 대시보드에서 직접 입력한다(sync: false).
+
+services:
+  - type: web
+    name: jinro-navigator
+    # runtime 은 예전 문서에서 env 라고 부르던 항목과 같은 뜻이다.
+    runtime: node
+    plan: free
+    # 한국에서 접속하므로 가장 가까운 싱가포르 지역을 쓴다. (무료 플랜에서도 선택 가능)
+    region: singapore
+    # package-lock.json 을 그대로 따라 설치한다. 반드시 lock 파일을 깃허브에 함께 올려야 한다.
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    # main(또는 기본) 브랜치에 push 하면 자동으로 다시 배포한다.
+    autoDeploy: true
+    envVars:
+      # Upstage API 키 — 값을 파일에 적지 않는다. Render 대시보드의 Environment 에서 직접 넣는다.
+      - key: UPSTAGE_API_KEY
+        sync: false
+      # 사용할 모델 이름. 바꿀 일이 없으면 그대로 둔다.
+      - key: UPSTAGE_MODEL
+        value: solar-pro4
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+    # PORT 는 Render 가 알아서 넣어 준다. server.js 가 process.env.PORT 를 읽으므로 따로 적지 않는다.

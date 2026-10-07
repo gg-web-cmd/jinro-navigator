@@ -2,6 +2,8 @@
 // LLM이 준 마크다운을 직접 파싱해 안전한 DOM으로 그리고(innerHTML 미사용),
 // 인쇄·복사·워드(.doc)·마크다운 저장과 SSE 스트리밍 보고서 요청을 담당합니다.
 
+import { buildFallbackReport } from './fallback.js';
+
 /* ────────────────────────────────────────────────────────────
  * 0. 작은 도우미
  * ──────────────────────────────────────────────────────────── */
@@ -603,6 +605,7 @@ export function downloadMarkdown(md, meta) {
  * 7. 보고서 요청 (SSE 스트리밍 → 실패 시 비스트리밍 재시도)
  * ──────────────────────────────────────────────────────────── */
 
+const LOCAL_NOTICE = '이 화면에서는 AI 서버 없이 기본 분석 엔진으로 보고서를 만들었어요.';
 const NET_ERROR_MSG = '보고서를 만들지 못했어요. 인터넷 연결을 확인하고 잠시 뒤 다시 시도해 주세요.';
 
 function isAbortError(err) {
@@ -775,6 +778,19 @@ export async function requestReport(payload, cbs = {}) {
     if (cbs.onDelta) cbs.onDelta(result.markdown, result.markdown);
     return finish(result);
   } catch (err) {
-    return fail(err);
+    if (isAbortError(err) || (signal && signal.aborted)) throw abortError();
+    // 서버(/api)가 없는 정적 호스팅(GitHub Pages)이거나 서버가 죽은 경우: 브라우저 안에서 기본 분석 엔진으로 만든다.
+    try {
+      const markdown = buildFallbackReport(payload);
+      if (!String(markdown || '').trim()) throw new Error('empty');
+      const result = { markdown, engine: 'fallback', model: 'rule-based', notice: LOCAL_NOTICE };
+      state.text = markdown;
+      if (cbs.onReset) cbs.onReset();
+      if (cbs.onMeta) cbs.onMeta({ engine: result.engine, model: result.model });
+      if (cbs.onDelta) cbs.onDelta(markdown, markdown);
+      return finish(result);
+    } catch (_) {
+      return fail(err);
+    }
   }
 }

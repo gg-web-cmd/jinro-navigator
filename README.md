@@ -5,6 +5,8 @@
 **Node.js와 Express로 만든 작은 웹앱이라 `npm start` 한 줄로 돌아가고, 학생 답변은 서버가 아니라 학생 브라우저에만 저장됩니다.**
 
 > 배포(인터넷 주소 만들기)는 [DEPLOY.md](DEPLOY.md)에 따로 정리해 두었습니다.
+>
+> **바로 써 보기:** https://gg-web-cmd.github.io/jinro-navigator/ — 깃허브 페이지스에는 서버가 없어 AI 대신 기본 분석 엔진으로 보고서가 만들어집니다.
 
 ---
 

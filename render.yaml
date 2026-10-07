@@ -25,6 +25,8 @@ services:
         value: solar-pro4
       - key: NODE_VERSION
         value: "20"
+      - key: ALLOWED_ORIGINS
+        value: https://gg-web-cmd.github.io
       - key: NODE_ENV
         value: production
     # PORT 는 Render 가 알아서 넣어 준다. server.js 가 process.env.PORT 를 읽으므로 따로 적지 않는다.

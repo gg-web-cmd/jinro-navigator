@@ -234,6 +234,26 @@ const app = express();
 app.set('trust proxy', true);
 app.disable('x-powered-by');
 app.use(express.json({ limit: '1mb' }));
+
+// 화면은 깃허브 페이지스(github.io)에 있고 이 서버는 보고서 API 만 맡을 수 있으므로,
+// 허용한 주소에서 온 /api 요청에만 CORS 를 열어 준다. 쉼표로 여러 개 지정할 수 있다.
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'https://gg-web-cmd.github.io')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use('/api', (req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+    res.setHeader('Access-Control-Max-Age', '86400');
+  }
+  if (req.method === 'OPTIONS') return res.status(204).end();
+  return next();
+});
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
 // 잘못된 JSON 본문도 한국어 JSON 으로 돌려준다.

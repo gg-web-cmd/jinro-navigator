@@ -3,6 +3,7 @@
 // 인쇄·복사·워드(.doc)·마크다운 저장과 SSE 스트리밍 보고서 요청을 담당합니다.
 
 import { buildFallbackReport } from './fallback.js';
+import { API_BASE } from './config.js';
 
 /* ────────────────────────────────────────────────────────────
  * 0. 작은 도우미
@@ -644,7 +645,7 @@ function drainEvents(buffer) {
 }
 
 async function postJson(url, payload, signal, accept) {
-  return fetch(url, {
+  return fetch(API_BASE + url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: accept || 'application/json' },
     body: JSON.stringify(payload),
